@@ -1,0 +1,32 @@
+{
+  "name": "bdl",
+  "version": "1.0.0",
+  "description": "brandirectory.london",
+  "main": "scrape.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lvnhmd/screenscraping.git"
+  },
+  "keywords": [
+    "brand",
+    "london",
+    "directory",
+    "shop",
+    "fashion"
+  ],
+  "author": "elvin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lvnhmd/screenscraping/issues"
+  },
+  "homepage": "https://github.com/lvnhmd/screenscraping",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "prettyjson": "^1.1.2",
+    "strip-json-comments": "^1.0.2",
+    "x-ray": "^2.0.2"
+  }
+}
