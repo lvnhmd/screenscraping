@@ -323,12 +323,12 @@ Source.prototype.get = function(paths, callback) {
 		this.poke();
 
 		// report this get to stats
-		this.config.statsManager.reportSource({
-			pattern: this.pattern,
-			startTime: startTime,
-			endTime: Date.now(),
-			hit: true
-		});
+		// this.config.statsManager.reportSource({
+		// 	pattern: this.pattern,
+		// 	startTime: startTime,
+		// 	endTime: Date.now(),
+		// 	hit: true
+		// });
 
 		return callback.call(this, null, this);
 	}
@@ -346,12 +346,12 @@ Source.prototype.get = function(paths, callback) {
 		this.stale = true;
 
 		// report this get to stats
-		this.config.statsManager.reportSource({
-			pattern: this.pattern,
-			startTime: startTime,
-			endTime: Date.now(),
-			stale: true
-		});
+		// this.config.statsManager.reportSource({
+		// 	pattern: this.pattern,
+		// 	startTime: startTime,
+		// 	endTime: Date.now(),
+		// 	stale: true
+		// });
 
 		callback.call(this, null, this);
 	} else {
@@ -721,19 +721,24 @@ Source.prototype.fetch = function(callback) {
 	if(roots['api'] && this.callbacks.length) { agentName = 'api'; }
 
 	// grab config for this agent
-	var agentConfig = this.config.agents[agentName];
-	if(!agentConfig) {
-		var err = new Error('Agent config for '+agentName+' Not found');
-		err.kind = 'fetch';
-		err.source = this.name;
-		return callback(err);
-	}
+	// var agentConfig = this.config.agents[agentName];
+	// if(!agentConfig) {
+	// 	var err = new Error('Agent config for '+agentName+' Not found');
+	// 	err.kind = 'fetch';
+	// 	err.source = this.name;
+	// 	return callback(err);
+	// }
 
-	// setup fetch using agent config, global config or defaults
-	options.timeout = agentConfig.timeout || this.config.fetchTimeout || 30000;
-	options.httpTimeout = agentConfig.httpTimeout || this.config.httpTimeout || 30000;
-	options.retries = agentConfig.retries || this.config.retries || 0;
-	options.retryDelay = agentConfig.retryDelay || this.config.retryDelay || 500;
+	// // setup fetch using agent config, global config or defaults
+	// options.timeout = agentConfig.timeout || this.config.fetchTimeout || 30000;
+	// options.httpTimeout = agentConfig.httpTimeout || this.config.httpTimeout || 30000;
+	// options.retries = agentConfig.retries || this.config.retries || 0;
+	// options.retryDelay = agentConfig.retryDelay || this.config.retryDelay || 500;
+	
+	options.timeout = 30000;
+	options.httpTimeout = 30000;
+	options.retries = 0;
+	options.retryDelay = 500;
 	options.source = this.name;
 
 	// get or create agent
@@ -742,8 +747,10 @@ Source.prototype.fetch = function(callback) {
 	options.agent = proto.agents[agentName];
 	if(!options.agent) {
 		options.agent = proto.agents[agentName] = new proto.Agent();
-		options.agent.maxSockets = agentConfig.maxConnections || 10;
-		options.agent.maxFetches = agentConfig.maxFetches || 10;
+		// options.agent.maxSockets = agentConfig.maxConnections || 10;
+		// options.agent.maxFetches = agentConfig.maxFetches || 10;
+		options.agent.maxSockets = 10;
+		options.agent.maxFetches = 10;
 	}
 
 	// fetch this source with a timeout
@@ -892,23 +899,23 @@ Source.prototype.done = function() {
 		this.setActiveExpires(Date.now()+'30s'.inMS, 'ErrorFailMinTTL');
 	}
 
-	this.config.statsManager.reportSource({
-		pattern: this.pattern,
-		processingTime: this.processingTime
-	});
+	// this.config.statsManager.reportSource({
+	// 	pattern: this.pattern,
+	// 	processingTime: this.processingTime
+	// });
 	this.processingTime = 0;
 
 	// call callbacks waiting on this source
 	while(this.callbacks.length) {
 		var cb = this.callbacks.shift();
 		// report this get to stats
-		this.config.statsManager.reportSource({
-			pattern: this.pattern,
-			startTime: cb.startTime,
-			endTime: Date.now(),
-			miss: !this.activeErr && !this.stale,
-			stale: !this.activeErr && this.stale
-		});
+		// this.config.statsManager.reportSource({
+		// 	pattern: this.pattern,
+		// 	startTime: cb.startTime,
+		// 	endTime: Date.now(),
+		// 	miss: !this.activeErr && !this.stale,
+		// 	stale: !this.activeErr && this.stale
+		// });
 
 		try {
 			cb.cb.call(this, this.activeErr, this);

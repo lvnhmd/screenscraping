@@ -3,10 +3,10 @@ var https = require('https');
 var url = require('url');
 var fs = require('fs');
 var path = require('path');
-var xml2json = require('xml2json');
-var hash = require('./hash');
+// var xml2json = require('xml2json');
+// var hash = require('./hash');
 var utils = require('./utils');
-var html2json = require('./html2json');
+// var html2json = require('./html2json');
 
 function Transport() {
 	this.config = {};
@@ -17,134 +17,134 @@ Transport.prototype.init = function(c) {
 };
 
 // response caching
-Transport.prototype.cacheFilename = function(url){
-	var md5 = hash.md5sum(url.toLowerCase());
-	return path.resolve(
-		__dirname, '..',
-		this.config.cacheDir,
-		md5.split('').slice(0,this.config.cacheLevels).join('/'),
-		md5+'.dat'
-	);
-};
+// Transport.prototype.cacheFilename = function(url){
+// 	var md5 = hash.md5sum(url.toLowerCase());
+// 	return path.resolve(
+// 		__dirname, '..',
+// 		this.config.cacheDir,
+// 		md5.split('').slice(0,this.config.cacheLevels).join('/'),
+// 		md5+'.dat'
+// 	);
+// };
 
-Transport.prototype.checkCache = function(url, cb){
-	var filename = this.cacheFilename(url);
-	fs.stat(filename, function(err, s){
-		if(err) { return cb(err, 0); }
-		cb(null, +s.mtime);
-	});
-};
+// Transport.prototype.checkCache = function(url, cb){
+// 	var filename = this.cacheFilename(url);
+// 	fs.stat(filename, function(err, s){
+// 		if(err) { return cb(err, 0); }
+// 		cb(null, +s.mtime);
+// 	});
+// };
 
-Transport.prototype.getCache = function(url, cb){
-	var filename = this.cacheFilename(url);
-	fs.stat(filename, function(err, s){
-		if(err) { return cb(null, 0, null, null); }
-		fs.readFile(filename, function(err, data){
-		if(err || !data) { return cb(null, 0, null, null); }
-			console.log('Reading cache from',path.basename(filename),'for',url);
-			cb(err, +s.mtime, data.slice(0,1).toString(), data.slice(1));
-		});
-	});
-};
+// Transport.prototype.getCache = function(url, cb){
+// 	var filename = this.cacheFilename(url);
+// 	fs.stat(filename, function(err, s){
+// 		if(err) { return cb(null, 0, null, null); }
+// 		fs.readFile(filename, function(err, data){
+// 		if(err || !data) { return cb(null, 0, null, null); }
+// 			console.log('Reading cache from',path.basename(filename),'for',url);
+// 			cb(err, +s.mtime, data.slice(0,1).toString(), data.slice(1));
+// 		});
+// 	});
+// };
 
-Transport.prototype.setCache = function(url, lastModified, type, data){
-	var mode = 0664;
-	var filename = this.cacheFilename(url);
-	utils.rmkdir(path.dirname(filename), function(err){
-		if(err) { return console.error('Error creating directory for cache',url,err); }
-		// write to a temporary file and then rename on complete
-		var tmpfilename = filename+'.download';
-		// try setting the mode of the file first
-		fs.chmod(tmpfilename, mode, function() {
-			var stream = fs.createWriteStream(tmpfilename, { flags: 'w', encoding: null, mode: mode });
-			stream.on('error', function(err){
-				if(err) { return console.error('Error writing cache data for',url,err); }
-			});
-			stream.on('close', function(){
-				lastModified = lastModified / 1000;
-				fs.utimes(tmpfilename, lastModified, lastModified, function(err){
-					if(err) { return console.error('Error updating cache date for',url,err); }
-					// overwrite old cache entry with new one
-					// try setting the mode of the file first
-					fs.chmod(filename, mode, function() {
-						fs.unlink(filename, function(){
-							fs.rename(tmpfilename, filename, function(err){
-								if(err) { return console.error('Error renaming cache file for',url,err); }
-							});
-						});
-					});
-				});
-			});
-			stream.write(type.slice(0,1), 'ascii');
-			stream.end(data);
-			data = null;
-		});
-	});
-};
+// Transport.prototype.setCache = function(url, lastModified, type, data){
+// 	var mode = 0664;
+// 	var filename = this.cacheFilename(url);
+// 	utils.rmkdir(path.dirname(filename), function(err){
+// 		if(err) { return console.error('Error creating directory for cache',url,err); }
+// 		// write to a temporary file and then rename on complete
+// 		var tmpfilename = filename+'.download';
+// 		// try setting the mode of the file first
+// 		fs.chmod(tmpfilename, mode, function() {
+// 			var stream = fs.createWriteStream(tmpfilename, { flags: 'w', encoding: null, mode: mode });
+// 			stream.on('error', function(err){
+// 				if(err) { return console.error('Error writing cache data for',url,err); }
+// 			});
+// 			stream.on('close', function(){
+// 				lastModified = lastModified / 1000;
+// 				fs.utimes(tmpfilename, lastModified, lastModified, function(err){
+// 					if(err) { return console.error('Error updating cache date for',url,err); }
+// 					// overwrite old cache entry with new one
+// 					// try setting the mode of the file first
+// 					fs.chmod(filename, mode, function() {
+// 						fs.unlink(filename, function(){
+// 							fs.rename(tmpfilename, filename, function(err){
+// 								if(err) { return console.error('Error renaming cache file for',url,err); }
+// 							});
+// 						});
+// 					});
+// 				});
+// 			});
+// 			stream.write(type.slice(0,1), 'ascii');
+// 			stream.end(data);
+// 			data = null;
+// 		});
+// 	});
+// };
 
-Transport.prototype.doNTLMAuth = function(options, res, cb){
-	var that = this;
-	if(!options.auth || options.auth.type !== 'ntlm') {
-		var err = new Error('Tried to do NTLM auth for non NTLM request');
-		err.kind = 'upstream';
-		err.url = options.uri;
-		err.source = options.source;
-		err.http = res.statusCode;
-		return cb(err);
-	}
+// Transport.prototype.doNTLMAuth = function(options, res, cb){
+// 	var that = this;
+// 	if(!options.auth || options.auth.type !== 'ntlm') {
+// 		var err = new Error('Tried to do NTLM auth for non NTLM request');
+// 		err.kind = 'upstream';
+// 		err.url = options.uri;
+// 		err.source = options.source;
+// 		err.http = res.statusCode;
+// 		return cb(err);
+// 	}
 
-	// proccess the content
-	res.on('data', function (chunk) {
-	});
+// 	// proccess the content
+// 	res.on('data', function (chunk) {
+// 	});
 
-	res.once('end', function(){
+// 	res.once('end', function(){
 
-		var ntlm = require('ntlm');
-		var KeepAliveAgent = require('keep-alive-agent');
+// 		var ntlm = require('ntlm');
+// 		var KeepAliveAgent = require('keep-alive-agent');
 
-		// hack for broken regex in ntlm module
-		res.headers['www-authenticate'] = res.headers['www-authenticate'] + ' ';
+// 		// hack for broken regex in ntlm module
+// 		res.headers['www-authenticate'] = res.headers['www-authenticate'] + ' ';
 
-		if(!options.auth.initialHeaderSent) {
-			console.log('Fetch', 'NTLM Sending initial header');
-			var parsedUrl = url.parse(options.uri);
-			var hostname = parsedUrl.hostname.split('.').shift();
-			options = Object.copy(options);
-			options.auth = Object.copy(options.auth);
-			options.auth.sendAuthHeader = ntlm.challengeHeader(hostname, options.auth.domain);
-			options.auth.initialHeaderSent = true;
-            options.agent = new KeepAliveAgent({
-				maxSockets: 1,
-				maxFreeSockets: 1,
-				keepAlive: true,
-				keepAliveMsecs: 30000
-            });
-			return that.oneFetch(options, cb);
-		}
+// 		if(!options.auth.initialHeaderSent) {
+// 			console.log('Fetch', 'NTLM Sending initial header');
+// 			var parsedUrl = url.parse(options.uri);
+// 			var hostname = parsedUrl.hostname.split('.').shift();
+// 			options = Object.copy(options);
+// 			options.auth = Object.copy(options.auth);
+// 			options.auth.sendAuthHeader = ntlm.challengeHeader(hostname, options.auth.domain);
+// 			options.auth.initialHeaderSent = true;
+//             options.agent = new KeepAliveAgent({
+// 				maxSockets: 1,
+// 				maxFreeSockets: 1,
+// 				keepAlive: true,
+// 				keepAliveMsecs: 30000
+//             });
+// 			return that.oneFetch(options, cb);
+// 		}
 
-		if(options.auth.initialHeaderSent && !options.auth.responseHeaderSent) {
-			console.log('Fetch', 'NTLM Received challenge header');
-			options = Object.copy(options);
-			options.auth = Object.copy(options.auth);
-	        options.auth.sendAuthHeader = ntlm.responseHeader(
-	        	res,
-	        	options.uri,
-	        	options.auth.domain,
-	        	options.auth.user,
-	        	options.auth.pass);
-			options.auth.responseHeaderSent = true;
-			console.log('Fetch', 'NTLM Sending response header');
-			return that.oneFetch(options, cb);
-		}
+// 		if(options.auth.initialHeaderSent && !options.auth.responseHeaderSent) {
+// 			console.log('Fetch', 'NTLM Received challenge header');
+// 			options = Object.copy(options);
+// 			options.auth = Object.copy(options.auth);
+// 	        options.auth.sendAuthHeader = ntlm.responseHeader(
+// 	        	res,
+// 	        	options.uri,
+// 	        	options.auth.domain,
+// 	        	options.auth.user,
+// 	        	options.auth.pass);
+// 			options.auth.responseHeaderSent = true;
+// 			console.log('Fetch', 'NTLM Sending response header');
+// 			return that.oneFetch(options, cb);
+// 		}
 
-		var err = new Error('Unexpected NTLM state');
-		err.kind = 'upstream';
-		err.url = options.uri;
-		err.source = options.source;
-		err.http = res.statusCode;
-		return cb(err);
-	});
-};
+// 		var err = new Error('Unexpected NTLM state');
+// 		err.kind = 'upstream';
+// 		err.url = options.uri;
+// 		err.source = options.source;
+// 		err.http = res.statusCode;
+// 		return cb(err);
+// 	});
+// };
 
 // fetch a url and return a json structure
 Transport.prototype.fetch = function(options, ocb) {

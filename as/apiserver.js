@@ -1,35 +1,49 @@
 
 var url = require('url');
-var zlib = require('zlib');
+// var zlib = require('zlib');
 var utils = require('./utils');
+var http_status_codes = require('./httpstatuscodes.json');
 
-var lastGarbageCollection = 0;
-var minGarbageCollectionInterval = '5m'.inMS;
-function garbageCollect() {
-	if(!global.gc) { return; }
-	var start = +(new Date());
-	if(start - lastGarbageCollection > minGarbageCollectionInterval) {
-		lastGarbageCollection = start;
-		var preMem = process.memoryUsage().heapUsed;
-		global.gc();
-		var postMem = process.memoryUsage().heapUsed;
-		console.log(
-			'Garbage collection took',utils.millisecondsToTime(+(new Date()) - start),
-			'and freed',Math.round((preMem-postMem)/1024)+'kb',
-			'of',Math.round(preMem/1024)+'kb'
-		);
-	}
-}
+// var lastGarbageCollection = 0;
+// var minGarbageCollectionInterval = '5m'.inMS;
+// function garbageCollect() {
+// 	if(!global.gc) { return; }
+// 	var start = +(new Date());
+// 	if(start - lastGarbageCollection > minGarbageCollectionInterval) {
+// 		lastGarbageCollection = start;
+// 		var preMem = process.memoryUsage().heapUsed;
+// 		global.gc();
+// 		var postMem = process.memoryUsage().heapUsed;
+// 		console.log(
+// 			'Garbage collection took',utils.millisecondsToTime(+(new Date()) - start),
+// 			'and freed',Math.round((preMem-postMem)/1024)+'kb',
+// 			'of',Math.round(preMem/1024)+'kb'
+// 		);
+// 	}
+// }
 
 function APIServer(config, cb) {
-	var that = this;
+// http://stackoverflow.com/questions/4886632/what-does-var-that-this-mean-in-javascript
+// var colours = ['red', 'green', 'blue'];
+// document.getElementById('element').addEventListener('click', function() {
+//     // this is a reference to the element clicked on
+
+//     var that = this;
+
+//     colours.forEach(function() {
+//         // this is undefined
+//         // that is a reference to the element clicked on
+//     });
+// });
+
+	var api_server = this;
 
 	this.config = config;
 
-	this.connections = 0;
-	this.shuttingdown = false;
+	// this.connections = 0;
+	// this.shuttingdown = false;
 
-	this.serverStartTime = Date.now();
+	// this.serverStartTime = Date.now();
 
 	this.server = require('http').createServer();
 
@@ -46,58 +60,69 @@ function APIServer(config, cb) {
 		});
 	});
 
-	this.server.on('request', function(req,res){
-		that.connections++;
-		res.once('finish', function(){
-			that.connections--;
-			if(that.connections <= 0) {
-				that.connections = 0;
-				// schedule garbage collection when there are no incomming conections
-				if(global.gc) {
-					process.nextTick(garbageCollect);
-				}
-			}
-			// check if we are shutting down and need to say all connections are closed
-			if(that.connections === 0 && that.shuttingdown && that.shuttingdownCallback) {
-				return that.shuttingdownCallback();
-			}
-		});
-		new APIServerConnection(that,req,res);
+	this.server.on('request', function(request, response){
+		// api_server.connections++;
+		// res.once('finish', function(){
+		// 	api_server.connections--;
+		// 	if(api_server.connections <= 0) {
+		// 		api_server.connections = 0;
+		// 		// schedule garbage collection when there are no incomming conections
+		// 		if(global.gc) {
+		// 			process.nextTick(garbageCollect);
+		// 		}
+		// 	}
+		// 	// check if we are shutting down and need to say all connections are closed
+		// 	if(api_server.connections === 0 && api_server.shuttingdown && api_server.shuttingdownCallback) {
+		// 		return api_server.shuttingdownCallback();
+		// 	}
+		// });
+		new APIServerConnection(api_server,request,response);
 	});
 
-	this.server.on('error', function(err){
-		console.error('Server error:',err);
-	});
+	// this.server.on('error', function(err){
+	// 	console.error('Server error:',err);
+	// });
 
 	this.server.listen(config.port, function(err){
-		if(err){ throw err; }
-		console.access(
-			'Server started:',
-			'Env: '+config.environment,
-			'Node: '+config.serverName,
-			'Port: '+config.port);
-		if(typeof cb === 'function'){ cb(); }
+		if (err) {
+			throw err;
+		}
+		// console.access(
+		// 	'Server started:',
+		// 	'Env: ' + config.environment,
+		// 	'Node: ' + config.serverName,
+		// 	'Port: ' + config.port);
+
+		console.log(
+			'Server started : ' +
+			' Env : '  + config.environment +
+			' Node : ' + config.serverName +
+			' Port : ' + config.port);
+		
+		if (typeof cb === 'function') {
+			cb();
+		}
 	});
 }
 
 // Shutdown by stopping listening for new connections and waiting for existing connections to finish.
 // timeout
-APIServer.prototype.shutdown = function(cb, timeout) {
-	var that = this;
+// APIServer.prototype.shutdown = function(cb, timeout) {
+// 	var that = this;
 
-	that.shuttingdown = true;
+// 	that.shuttingdown = true;
 
-	// create a callback with timeout defaulted to 10 seconds
-	that.shuttingdownCallback = callbackTimeout(cb, timeout || 10000);
+// 	// create a callback with timeout defaulted to 10 seconds
+// 	that.shuttingdownCallback = callbackTimeout(cb, timeout || 10000);
 
-	// stop listening
-	this.server.close(function(){
-		if(that.connections === 0) {
-			return that.shuttingdownCallback();
-		}
-	});
+// 	// stop listening
+// 	this.server.close(function(){
+// 		if(that.connections === 0) {
+// 			return that.shuttingdownCallback();
+// 		}
+// 	});
 
-};
+// };
 
 // An individual connection
 function APIServerConnection(server, req, res) {
@@ -108,18 +133,18 @@ function APIServerConnection(server, req, res) {
 	this.res = res;
 
 	// init timings
-	this.ip = req.socket.remoteAddress;
-	if(this.ip === '127.0.0.1' && req.headers['x-forwarded-for']) {
-		this.ip = req.headers['x-forwarded-for'];
-	}
-	this.startTime = Date.now();
-	this.responseTime = 0;
-	this.endTime = 0;
-	this.status = 0;
-	this.size = 0;
-	this.lastModified = 0;
-	this.ttl = 0;
-	this.acceptEncoding = '';
+	// this.ip = req.socket.remoteAddress;
+	// if(this.ip === '127.0.0.1' && req.headers['x-forwarded-for']) {
+	// 	this.ip = req.headers['x-forwarded-for'];
+	// }
+	// this.startTime = Date.now();
+	// this.responseTime = 0;
+	// this.endTime = 0;
+	// this.status = 0;
+	// this.size = 0;
+	// this.lastModified = 0;
+	// this.ttl = 0;
+	// this.acceptEncoding = '';
 
 	// split up path
 	var path = url.parse(req.url).path.split('/');
@@ -127,50 +152,50 @@ function APIServerConnection(server, req, res) {
 	this.apiName = path.slice(2).join('/');
 
 	// connection counting and stats logging on connection close
-	res.once('finish', function(){
-		// report stats for this request
-		that.endTime = Date.now();
-		that.server.config.statsManager.reportRequest({
-			ip: that.ip || '-',
-			status: that.status || 0,
-			size: that.size || 0,
-			startTime: that.startTime || 0,
-			responseTime: that.responseTime || 0,
-			endTime: that.endTime || 0,
-			root: that.root || '-',
-			path: that.apiName || '-',
-			connections: that.server.connections || 0,
-			lastModified: that.lastModified,
-			ttl: that.ttl
-		});
-	});
+	// res.once('finish', function(){
+	// 	// report stats for this request
+	// 	that.endTime = Date.now();
+	// 	that.server.config.statsManager.reportRequest({
+	// 		ip: that.ip || '-',
+	// 		status: that.status || 0,
+	// 		size: that.size || 0,
+	// 		startTime: that.startTime || 0,
+	// 		responseTime: that.responseTime || 0,
+	// 		endTime: that.endTime || 0,
+	// 		root: that.root || '-',
+	// 		path: that.apiName || '-',
+	// 		connections: that.server.connections || 0,
+	// 		lastModified: that.lastModified,
+	// 		ttl: that.ttl
+	// 	});
+	// });
 
 	// check this was a get request
-	if(req.method !== 'GET') {
-		return this.sendResponse(405, this.startTime+'10s'.inMS, 0, 'Method not allowed', 'text/plain');
-	}
+	// if(req.method !== 'GET') {
+	// 	return this.sendResponse(405, this.startTime+'10s'.inMS, 0, 'Method not allowed', 'text/plain');
+	// }
 
 	// respond to request paths
-	switch(this.root) {
+	// switch(this.root) {
 		// return 200 for /
-		case '':
-			return this.sendResponse(200, this.startTime+'1m'.inMS, 0,
-				'Env: '+this.server.config.environment+
-				'\nNode: '+this.server.config.serverName);
+		// case '':
+		// 	return this.sendResponse(200, this.startTime+'1m'.inMS, 0,
+		// 		'Env: '+this.server.config.environment+
+		// 		'\nNode: '+this.server.config.serverName);
 
-		case 'api':
+		// case 'api':
 			// fetch headers
-			this.ifModifiedSince = req.headers['if-modified-since'] ?
-				+(new Date(req.headers['if-modified-since'])) : 0;
-			this.acceptEncoding = req.headers['accept-encoding'] || '';
+			// this.ifModifiedSince = req.headers['if-modified-since'] ?
+			// 	+(new Date(req.headers['if-modified-since'])) : 0;
+			// this.acceptEncoding = req.headers['accept-encoding'] || '';
 			return this.getData(this.apiName);
 
-		case 'robots.txt':
-			return this.sendResponse(200, this.startTime+'1d'.inMS, 0, 'User-agent: *\nDisallow: /\n', 'text/plain');
+		// case 'robots.txt':
+		// 	return this.sendResponse(200, this.startTime+'1d'.inMS, 0, 'User-agent: *\nDisallow: /\n', 'text/plain');
 
-		default:
-			return this.sendResponse(404, this.startTime+'1m'.inMS, 0, {success:false,reason:'File Not Found: '+this.root});
-	}
+	// 	default:
+	// 		return this.sendResponse(404, this.startTime+'1m'.inMS, 0, {success:false,reason:'File Not Found: '+this.root});
+	// }
 
 }
 
@@ -194,11 +219,14 @@ APIServerConnection.prototype.sendResponse = function(status, expires, lastModif
 	this.responseTime = Date.now();
 	if(status) { this.status = status; }
 	this.res.statusCode = this.status;
+
+	console.log('~~~APIServerConnection.prototype.sendResponse~~~');
+
 	this.res.setHeader('Content-Type', type || 'application/json; charset=utf-8');
-	this.res.setHeader('X-Node', this.server.config.serverName);
-	this.res.setHeader('X-Environment', this.server.config.environment);
-	this.res.setHeader('X-API-Level', this.server.config.apiLevel);
-	this.res.setHeader('Last-Modified', utils.toDate(lastModified || Date.now()).toUTCString());
+	// this.res.setHeader('X-Node', this.server.config.serverName);
+	// this.res.setHeader('X-Environment', this.server.config.environment);
+	// this.res.setHeader('X-API-Level', this.server.config.apiLevel);
+	// this.res.setHeader('Last-Modified', utils.toDate(lastModified || Date.now()).toUTCString());
 	// set expires date
 	this.res.setHeader('Expires', (new Date(expires)).toUTCString());
 	// tell nginx to cache for this long
@@ -282,55 +310,65 @@ APIServerConnection.prototype.errorResponse = function(err) {
 };
 
 // get the data from the source manager and return it to the connection with ttl set
-APIServerConnection.prototype.getData = function(apiName, cb){
+APIServerConnection.prototype.getData = function(apiName, cb) {
 
 	// check we are only requesting published sources if we are in any env except dev
-	var checkPublish = !this.server.config.isDevelopment;
+	// var checkPublish = !this.server.config.isDevelopment;
+	var checkPublish = false;
 
 	var that = this;
 	var path = ['api'];
+	
 	this.server.config.sourceManager.get(apiName, [path], callbackTimeout(function(err, source) {
-		if(err) {
-			err.kind = err.kind || 'server';
-			err.source = err.source || that.apiName;
-			if(cb){ cb(false); }
-			return that.errorResponse(err);
-		}
-		if(!source) {
-			err = new Error('Null source returned from source manager');
-			err.kind = err.kind || 'server';
-			err.source = err.source || that.apiName;
-			if(cb){ cb(false); }
-			return that.errorResponse(err);
-		}
-		if(!source.data) {
-			err = new Error('Null data returned from source');
-			err.kind = err.kind || 'server';
-			err.source = err.source || that.apiName;
-			if(cb){ cb(false); }
-			return that.errorResponse(err);
-		}
+		// if (err) {
+		// 	err.kind = err.kind || 'server';
+		// 	err.source = err.source || that.apiName;
+		// 	if (cb) {
+		// 		cb(false);
+		// 	}
+		// 	return that.errorResponse(err);
+		// }
+		// if (!source) {
+		// 	err = new Error('Null source returned from source manager');
+		// 	err.kind = err.kind || 'server';
+		// 	err.source = err.source || that.apiName;
+		// 	if (cb) {
+		// 		cb(false);
+		// 	}
+		// 	return that.errorResponse(err);
+		// }
+		// if (!source.data) {
+		// 	err = new Error('Null data returned from source');
+		// 	err.kind = err.kind || 'server';
+		// 	err.source = err.source || that.apiName;
+		// 	if (cb) {
+		// 		cb(false);
+		// 	}
+		// 	return that.errorResponse(err);
+		// }
 
-		if(cb){ cb(true); }
+		// if (cb) {
+		// 	cb(true);
+		// }
 
-		// check if we can just send a not-modified response to save bandwidth and time
-		if(source.lastModified && that.ifModifiedSince) {
-			if(that.ifModifiedSince >= source.lastModified) {
-				// send not-modified
-				return that.sendResponse(304, source.expires, source.lastModified);
-			}
-		}
+		// // check if we can just send a not-modified response to save bandwidth and time
+		// if (source.lastModified && that.ifModifiedSince) {
+		// 	if (that.ifModifiedSince >= source.lastModified) {
+		// 		// send not-modified
+		// 		return that.sendResponse(304, source.expires, source.lastModified);
+		// 	}
+		// }
 
-		if(typeof source.data === 'string') {
-			return that.sendResponse(200, source.expires, source.lastModified, source.data, 'text/html');
-		}
+		// if (typeof source.data === 'string') {
+		// 	return that.sendResponse(200, source.expires, source.lastModified, source.data, 'text/html');
+		// }
 
-		return that.sendResponse(200, source.expires, source.lastModified, {
+		return that.sendResponse(http_status_codes['OK'], source.expires, source.lastModified, {
 			success: !!source.publish,
-			expires: utils.dateToW3C(utils.toDate(source.expires||0)),
+			expires: utils.dateToW3C(utils.toDate(source.expires || 0)),
 			expiresSource: source.expiresSource || 'UNKNOWN',
-			lastModified: utils.dateToW3C(utils.toDate(source.lastModified||0)),
-			data:source.data
+			lastModified: utils.dateToW3C(utils.toDate(source.lastModified || 0)),
+			data: source.data
 		});
 	}, that.server.config.timeout), checkPublish);
 };
