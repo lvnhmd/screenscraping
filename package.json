@@ -2,7 +2,7 @@
   "name": "bdl",
   "version": "1.0.0",
   "description": "brandirectory.london",
-  "main": "scrape.js",
+  "main": "./server",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
