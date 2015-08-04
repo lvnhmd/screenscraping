@@ -17,8 +17,16 @@
     "url": "http://www.selfridges.com/GB/en/cat/adidas/womens/"
   },
   {
+    "name": "ADIDAS BY STELLA MCCARTNEY",
+    "url": "http://www.selfridges.com/GB/en/cat/adidas-by-stella-mccartney/womens/"
+  },
+  {
     "name": "AG",
     "url": "http://www.selfridges.com/GB/en/cat/ag/womens/"
+  },
+  {
+    "name": "ALESSANDRA RICH",
+    "url": "http://www.selfridges.com/GB/en/cat/alessandra-rich/womens/"
   },
   {
     "name": "ALESSI",
@@ -301,6 +309,10 @@
     "url": "http://www.selfridges.com/GB/en/cat/citizens-of-humanity/womens/"
   },
   {
+    "name": "CJG SHOES",
+    "url": "http://www.selfridges.com/GB/en/cat/cjg-shoes/womens/"
+  },
+  {
     "name": "CLAUDIE PIERLOT",
     "url": "http://www.selfridges.com/GB/en/cat/claudie-pierlot/womens/"
   },
@@ -355,6 +367,10 @@
   {
     "name": "DAVID KOMA",
     "url": "http://www.selfridges.com/GB/en/cat/david-koma/womens/"
+  },
+  {
+    "name": "DEAR BOWIE",
+    "url": "http://www.selfridges.com/GB/en/cat/dear-bowie/womens/"
   },
   {
     "name": "DENTS",
@@ -545,6 +561,10 @@
     "url": "http://www.selfridges.com/GB/en/cat/g-shock/womens/"
   },
   {
+    "name": "GARETH PUGH",
+    "url": "http://www.selfridges.com/GB/en/cat/gareth-pugh/womens/"
+  },
+  {
     "name": "GARMENT PROJECT",
     "url": "http://www.selfridges.com/GB/en/cat/garment-project/womens/"
   },
@@ -623,6 +643,10 @@
   {
     "name": "HAIDER ACKERMANN",
     "url": "http://www.selfridges.com/GB/en/cat/haider-ackermann/womens/"
+  },
+  {
+    "name": "HALCYON DAYS",
+    "url": "http://www.selfridges.com/GB/en/cat/halcyon-days/womens/"
   },
   {
     "name": "HANKY PANKY",
@@ -771,6 +795,10 @@
   {
     "name": "JUNGHANS",
     "url": "http://www.selfridges.com/GB/en/cat/junghans/womens/"
+  },
+  {
+    "name": "JUNYA WATANABE",
+    "url": "http://www.selfridges.com/GB/en/cat/junya-watanabe/womens/"
   },
   {
     "name": "JUST CAVALLI",
@@ -1005,6 +1033,10 @@
     "url": "http://www.selfridges.com/GB/en/cat/maurice-lacroix/womens/"
   },
   {
+    "name": "MAWI",
+    "url": "http://www.selfridges.com/GB/en/cat/mawi/womens/"
+  },
+  {
     "name": "MAX MARA",
     "url": "http://www.selfridges.com/GB/en/cat/max-mara/womens/"
   },
@@ -1053,8 +1085,16 @@
     "url": "http://www.selfridges.com/GB/en/cat/michael-kors/womens/"
   },
   {
+    "name": "MICHAEL KORS COLLECTION",
+    "url": "http://www.selfridges.com/GB/en/cat/michael-kors-collection/womens/"
+  },
+  {
     "name": "MICHAEL KORS JEWELLERY",
     "url": "http://www.selfridges.com/GB/en/cat/michael-kors-jewellery/womens/"
+  },
+  {
+    "name": "MICHAEL KORS WATCHES",
+    "url": "http://www.selfridges.com/GB/en/cat/michael-kors-watches/womens/"
   },
   {
     "name": "MICHAEL MICHAEL KORS",
@@ -1187,6 +1227,10 @@
   {
     "name": "ODLO",
     "url": "http://www.selfridges.com/GB/en/cat/odlo/womens/"
+  },
+  {
+    "name": "OFF WHITE",
+    "url": "http://www.selfridges.com/GB/en/cat/off-white/womens/"
   },
   {
     "name": "OFFICINE CREATIVE",
@@ -1335,6 +1379,10 @@
   {
     "name": "REEBOK",
     "url": "http://www.selfridges.com/GB/en/cat/reebok/womens/"
+  },
+  {
+    "name": "REIKO",
+    "url": "http://www.selfridges.com/GB/en/cat/reiko/womens/"
   },
   {
     "name": "REISS",
@@ -1743,6 +1791,10 @@
   {
     "name": "3.1 PHILLIP LIM",
     "url": "http://www.selfridges.com/GB/en/cat/3-1-phillip-lim/womens/"
+  },
+  {
+    "name": "360 CASHMERE",
+    "url": "http://www.selfridges.com/GB/en/cat/360-cashmere/womens/"
   },
   {
     "name": "5CM",

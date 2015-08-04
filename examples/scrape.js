@@ -22,6 +22,6 @@ x('http://www.selfridges.com/en/OnlineBrandDirectory/?categoryId=548261&storeSel
 }])
   .paginate('.next_page@href')
   .limit(3)
-  .write('selfridges.json')
+  .write('../persist/selfridges.json')
 
   

@@ -7,7 +7,7 @@ var prettyjson = require('prettyjson');
 //   noColor: false
 // };
 
-var str = fs.readFileSync('selfridges_comments.json','utf8');
+var str = fs.readFileSync('../persist/selfridges_comments.json','utf8');
 
 // console.log(prettyjson.render(JSON.parse(str)));
 // will throw Unexpected token / because there are commments in the json file 
