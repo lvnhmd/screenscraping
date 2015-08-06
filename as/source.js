@@ -472,11 +472,13 @@ Source.prototype.filter = function(obj, cb) {
 
 // get data of result by nickname or path
 Source.prototype.getResult = function(name, throwError) {
+	console.log('Source.prototype.getResult begin'.verbose);
 	var result = this.getResultRecord(name, throwError);
 	if(!result) { return undefined; }
 	if(throwError && result.err) {
 		throw result.err;
 	}
+	console.log('Source.prototype.getResult end'.verbose);
 	return result.data;
 };
 
