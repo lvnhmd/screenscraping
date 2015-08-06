@@ -5,7 +5,7 @@ require('colors').setTheme('../themes/generic-logging.js');
 //Run as: NODE_ENV=production node index.js
 
 function AS(config, definitions) {
-	console.log('index.js as definition begin'.info);
+	console.log('as:index.js definition begin'.help);
 	//load config
 	// config.environment = process.env.NODE_ENV || config.environment || 'production';
 
@@ -109,7 +109,7 @@ function AS(config, definitions) {
 	// 		},2000);
 	// 	}
 	// });
-	console.log('index.js as definition end'.help);
+	console.log('as:index.js definition end'.help);
 
 }
 
