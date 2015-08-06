@@ -320,36 +320,36 @@ APIServerConnection.prototype.getData = function(apiName, cb) {
 	var path = ['api'];
 	
 	this.server.config.sourceManager.get(apiName, [path], callbackTimeout(function(err, source) {
-		// if (err) {
-		// 	err.kind = err.kind || 'server';
-		// 	err.source = err.source || that.apiName;
-		// 	if (cb) {
-		// 		cb(false);
-		// 	}
-		// 	return that.errorResponse(err);
-		// }
-		// if (!source) {
-		// 	err = new Error('Null source returned from source manager');
-		// 	err.kind = err.kind || 'server';
-		// 	err.source = err.source || that.apiName;
-		// 	if (cb) {
-		// 		cb(false);
-		// 	}
-		// 	return that.errorResponse(err);
-		// }
-		// if (!source.data) {
-		// 	err = new Error('Null data returned from source');
-		// 	err.kind = err.kind || 'server';
-		// 	err.source = err.source || that.apiName;
-		// 	if (cb) {
-		// 		cb(false);
-		// 	}
-		// 	return that.errorResponse(err);
-		// }
+		if (err) {
+			err.kind = err.kind || 'server';
+			err.source = err.source || that.apiName;
+			if (cb) {
+				cb(false);
+			}
+			return that.errorResponse(err);
+		}
+		if (!source) {
+			err = new Error('Null source returned from source manager');
+			err.kind = err.kind || 'server';
+			err.source = err.source || that.apiName;
+			if (cb) {
+				cb(false);
+			}
+			return that.errorResponse(err);
+		}
+		if (!source.data) {
+			err = new Error('Null data returned from source');
+			err.kind = err.kind || 'server';
+			err.source = err.source || that.apiName;
+			if (cb) {
+				cb(false);
+			}
+			return that.errorResponse(err);
+		}
 
-		// if (cb) {
-		// 	cb(true);
-		// }
+		if (cb) {
+			cb(true);
+		}
 
 		// // check if we can just send a not-modified response to save bandwidth and time
 		// if (source.lastModified && that.ifModifiedSince) {
