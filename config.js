@@ -1,6 +1,6 @@
 module.exports = {
 	port: 8080,
-	cacheDir: '../../cache',
+	cacheDir: 'cache',
 	// source configs
 	sourceTypes: {
 		'static': {
