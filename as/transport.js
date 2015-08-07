@@ -83,69 +83,69 @@ Transport.prototype.setCache = function(url, lastModified, type, data){
 	});
 };
 
-Transport.prototype.doNTLMAuth = function(options, res, cb){
-	var that = this;
-	if(!options.auth || options.auth.type !== 'ntlm') {
-		var err = new Error('Tried to do NTLM auth for non NTLM request');
-		err.kind = 'upstream';
-		err.url = options.uri;
-		err.source = options.source;
-		err.http = res.statusCode;
-		return cb(err);
-	}
+// Transport.prototype.doNTLMAuth = function(options, res, cb){
+// 	var that = this;
+// 	if(!options.auth || options.auth.type !== 'ntlm') {
+// 		var err = new Error('Tried to do NTLM auth for non NTLM request');
+// 		err.kind = 'upstream';
+// 		err.url = options.uri;
+// 		err.source = options.source;
+// 		err.http = res.statusCode;
+// 		return cb(err);
+// 	}
 
-	// proccess the content
-	res.on('data', function (chunk) {
-	});
+// 	// proccess the content
+// 	res.on('data', function (chunk) {
+// 	});
 
-	res.once('end', function(){
+// 	res.once('end', function(){
 
-		var ntlm = require('ntlm');
-		var KeepAliveAgent = require('keep-alive-agent');
+// 		var ntlm = require('ntlm');
+// 		var KeepAliveAgent = require('keep-alive-agent');
 
-		// hack for broken regex in ntlm module
-		res.headers['www-authenticate'] = res.headers['www-authenticate'] + ' ';
+// 		// hack for broken regex in ntlm module
+// 		res.headers['www-authenticate'] = res.headers['www-authenticate'] + ' ';
 
-		if(!options.auth.initialHeaderSent) {
-			console.log('Fetch', 'NTLM Sending initial header');
-			var parsedUrl = url.parse(options.uri);
-			var hostname = parsedUrl.hostname.split('.').shift();
-			options = Object.copy(options);
-			options.auth = Object.copy(options.auth);
-			options.auth.sendAuthHeader = ntlm.challengeHeader(hostname, options.auth.domain);
-			options.auth.initialHeaderSent = true;
-            options.agent = new KeepAliveAgent({
-				maxSockets: 1,
-				maxFreeSockets: 1,
-				keepAlive: true,
-				keepAliveMsecs: 30000
-            });
-			return that.oneFetch(options, cb);
-		}
+// 		if(!options.auth.initialHeaderSent) {
+// 			console.log('Fetch', 'NTLM Sending initial header');
+// 			var parsedUrl = url.parse(options.uri);
+// 			var hostname = parsedUrl.hostname.split('.').shift();
+// 			options = Object.copy(options);
+// 			options.auth = Object.copy(options.auth);
+// 			options.auth.sendAuthHeader = ntlm.challengeHeader(hostname, options.auth.domain);
+// 			options.auth.initialHeaderSent = true;
+//             options.agent = new KeepAliveAgent({
+// 				maxSockets: 1,
+// 				maxFreeSockets: 1,
+// 				keepAlive: true,
+// 				keepAliveMsecs: 30000
+//             });
+// 			return that.oneFetch(options, cb);
+// 		}
 
-		if(options.auth.initialHeaderSent && !options.auth.responseHeaderSent) {
-			console.log('Fetch', 'NTLM Received challenge header');
-			options = Object.copy(options);
-			options.auth = Object.copy(options.auth);
-	        options.auth.sendAuthHeader = ntlm.responseHeader(
-	        	res,
-	        	options.uri,
-	        	options.auth.domain,
-	        	options.auth.user,
-	        	options.auth.pass);
-			options.auth.responseHeaderSent = true;
-			console.log('Fetch', 'NTLM Sending response header');
-			return that.oneFetch(options, cb);
-		}
+// 		if(options.auth.initialHeaderSent && !options.auth.responseHeaderSent) {
+// 			console.log('Fetch', 'NTLM Received challenge header');
+// 			options = Object.copy(options);
+// 			options.auth = Object.copy(options.auth);
+// 	        options.auth.sendAuthHeader = ntlm.responseHeader(
+// 	        	res,
+// 	        	options.uri,
+// 	        	options.auth.domain,
+// 	        	options.auth.user,
+// 	        	options.auth.pass);
+// 			options.auth.responseHeaderSent = true;
+// 			console.log('Fetch', 'NTLM Sending response header');
+// 			return that.oneFetch(options, cb);
+// 		}
 
-		var err = new Error('Unexpected NTLM state');
-		err.kind = 'upstream';
-		err.url = options.uri;
-		err.source = options.source;
-		err.http = res.statusCode;
-		return cb(err);
-	});
-};
+// 		var err = new Error('Unexpected NTLM state');
+// 		err.kind = 'upstream';
+// 		err.url = options.uri;
+// 		err.source = options.source;
+// 		err.http = res.statusCode;
+// 		return cb(err);
+// 	});
+// };
 
 // fetch a url and return a json structure
 Transport.prototype.fetch = function(options, ocb) {
@@ -352,12 +352,12 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 						return retry();
 					}
 
-					if(res.statusCode === 401 && options.auth) {
-						var authHeader = res.headers['www-authenticate'];
-						if(authHeader && ~authHeader.indexOf('NTLM')) {
-							return that.doNTLMAuth(options, res, cb);
-						}
-					}
+					// if(res.statusCode === 401 && options.auth) {
+					// 	var authHeader = res.headers['www-authenticate'];
+					// 	if(authHeader && ~authHeader.indexOf('NTLM')) {
+					// 		return that.doNTLMAuth(options, res, cb);
+					// 	}
+					// }
 
 					if(res.statusCode === 404 && options.fetchDataOn404) {
 						res.socket.end();
