@@ -220,8 +220,6 @@ APIServerConnection.prototype.sendResponse = function(status, expires, lastModif
 	if(status) { this.status = status; }
 	this.res.statusCode = this.status;
 
-	console.log('~~~APIServerConnection.prototype.sendResponse~~~');
-
 	this.res.setHeader('Content-Type', type || 'application/json; charset=utf-8');
 	// this.res.setHeader('X-Node', this.server.config.serverName);
 	// this.res.setHeader('X-Environment', this.server.config.environment);
