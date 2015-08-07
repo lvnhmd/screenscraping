@@ -7,6 +7,7 @@ var path = require('path');
 var hash = require('./hash');
 var utils = require('./utils');
 // var html2json = require('./html2json');
+var xray = require('x-ray')();
 
 function Transport() {
 	this.config = {};
@@ -190,8 +191,30 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 					break;
 				case 'h':
 					// json = html2json.parse(raw);
-					json = {};
-					console.log(raw);
+					// xray(url, scope, selector)(fn(err,data))
+					
+				// x('http://news.ycombinator.com', 'tr.athing', [{}])
+				// 	(function(err, data) {
+				// 		if (err) {
+				// 			console.log('Error: ' + err);
+				// 		} else {
+				// 			console.log(data);
+				// 		}
+				// 	});
+					
+					xray(raw, 'li.shopBrandItem', [{
+							name: 'a',
+							url: 'a@href',
+						}])
+						(function(err, data) {
+							if (err) {
+								console.log('Error: ' + err);
+							} else {
+								console.log(data);
+								json = data;
+							}
+						});
+					
 					break;
 				case 'j':
 					json = JSON.parse(raw);
