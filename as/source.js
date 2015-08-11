@@ -1,3 +1,4 @@
+"use strict";
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
@@ -273,7 +274,7 @@ Source.prototype.save = function(callback) {
 	};
 	var data = JSON.stringify(json);
 	utils.rmkdir(path.dirname(filename), function(err){
-		var mode = 0664;
+		var mode = '0664';
 		if(err) {
 			console.error('Error making persisted JSON dir', that.name, err);
 		}

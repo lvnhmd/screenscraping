@@ -1,3 +1,4 @@
+"use strict";
 require('colors').setTheme('../themes/generic-logging.js');
 // load util support library first so functions can be used in config
 // require('./utils').applyToPrimatives();

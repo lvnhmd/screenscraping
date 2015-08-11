@@ -1,4 +1,4 @@
-
+"use strict";
 var url = require('url');
 // var zlib = require('zlib');
 var utils = require('./utils');

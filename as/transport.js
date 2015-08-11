@@ -1,10 +1,11 @@
+"use strict";
 var http = require('http');
 var https = require('https');
 var url = require('url');
 var fs = require('fs');
 var path = require('path');
 // var xml2json = require('xml2json');
-var hash = require('./hash');
+// var hash = require('./hash');
 var utils = require('./utils');
 // var html2json = require('./html2json');
 var xray = require('x-ray')();

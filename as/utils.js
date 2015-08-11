@@ -1,3 +1,4 @@
+"use strict";
 var fs = require('fs');
 require('colors');
 // empty function
@@ -5,7 +6,7 @@ global.nop = function(){};
 
 // recursive mkdir (like mkdir -p)
 exports.rmkdir = function(dir, cb) {
-	var mode = 0775;
+	var mode = '0775';
 	// try non-recursively creating the dir first
 	fs.mkdir(dir, mode, function(err){
 		if (!err || err.code === 'EEXIST'){
