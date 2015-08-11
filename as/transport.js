@@ -18,70 +18,70 @@ Transport.prototype.init = function(c) {
 };
 
 // response caching
-Transport.prototype.cacheFilename = function(url){
-	var md5 = hash.md5sum(url.toLowerCase());
-	return path.resolve(
-		__dirname, '..',
-		this.config.cacheDir,
-		md5.split('').slice(0,this.config.cacheLevels).join('/'),
-		md5+'.dat'
-	);
-};
+// Transport.prototype.cacheFilename = function(url){
+// 	var md5 = hash.md5sum(url.toLowerCase());
+// 	return path.resolve(
+// 		__dirname, '..',
+// 		this.config.cacheDir,
+// 		md5.split('').slice(0,this.config.cacheLevels).join('/'),
+// 		md5+'.dat'
+// 	);
+// };
 
-Transport.prototype.checkCache = function(url, cb){
-	var filename = this.cacheFilename(url);
-	fs.stat(filename, function(err, s){
-		if(err) { return cb(err, 0); }
-		cb(null, +s.mtime);
-	});
-};
+// Transport.prototype.checkCache = function(url, cb){
+// 	var filename = this.cacheFilename(url);
+// 	fs.stat(filename, function(err, s){
+// 		if(err) { return cb(err, 0); }
+// 		cb(null, +s.mtime);
+// 	});
+// };
 
-Transport.prototype.getCache = function(url, cb){
-	var filename = this.cacheFilename(url);
-	fs.stat(filename, function(err, s){
-		if(err) { return cb(null, 0, null, null); }
-		fs.readFile(filename, function(err, data){
-		if(err || !data) { return cb(null, 0, null, null); }
-			console.log('Reading cache from',path.basename(filename),'for',url);
-			cb(err, +s.mtime, data.slice(0,1).toString(), data.slice(1));
-		});
-	});
-};
+// Transport.prototype.getCache = function(url, cb){
+// 	var filename = this.cacheFilename(url);
+// 	fs.stat(filename, function(err, s){
+// 		if(err) { return cb(null, 0, null, null); }
+// 		fs.readFile(filename, function(err, data){
+// 		if(err || !data) { return cb(null, 0, null, null); }
+// 			console.log('Reading cache from',path.basename(filename),'for',url);
+// 			cb(err, +s.mtime, data.slice(0,1).toString(), data.slice(1));
+// 		});
+// 	});
+// };
 
-Transport.prototype.setCache = function(url, lastModified, type, data){
-	var mode = 0664;
-	var filename = this.cacheFilename(url);
-	utils.rmkdir(path.dirname(filename), function(err){
-		if(err) { return console.error('Error creating directory for cache',url,err); }
-		// write to a temporary file and then rename on complete
-		var tmpfilename = filename+'.download';
-		// try setting the mode of the file first
-		fs.chmod(tmpfilename, mode, function() {
-			var stream = fs.createWriteStream(tmpfilename, { flags: 'w', encoding: null, mode: mode });
-			stream.on('error', function(err){
-				if(err) { return console.error('Error writing cache data for',url,err); }
-			});
-			stream.on('close', function(){
-				lastModified = lastModified / 1000;
-				fs.utimes(tmpfilename, lastModified, lastModified, function(err){
-					if(err) { return console.error('Error updating cache date for',url,err); }
-					// overwrite old cache entry with new one
-					// try setting the mode of the file first
-					fs.chmod(filename, mode, function() {
-						fs.unlink(filename, function(){
-							fs.rename(tmpfilename, filename, function(err){
-								if(err) { return console.error('Error renaming cache file for',url,err); }
-							});
-						});
-					});
-				});
-			});
-			stream.write(type.slice(0,1), 'ascii');
-			stream.end(data);
-			data = null;
-		});
-	});
-};
+// Transport.prototype.setCache = function(url, lastModified, type, data){
+// 	var mode = 0664;
+// 	var filename = this.cacheFilename(url);
+// 	utils.rmkdir(path.dirname(filename), function(err){
+// 		if(err) { return console.error('Error creating directory for cache',url,err); }
+// 		// write to a temporary file and then rename on complete
+// 		var tmpfilename = filename+'.download';
+// 		// try setting the mode of the file first
+// 		fs.chmod(tmpfilename, mode, function() {
+// 			var stream = fs.createWriteStream(tmpfilename, { flags: 'w', encoding: null, mode: mode });
+// 			stream.on('error', function(err){
+// 				if(err) { return console.error('Error writing cache data for',url,err); }
+// 			});
+// 			stream.on('close', function(){
+// 				lastModified = lastModified / 1000;
+// 				fs.utimes(tmpfilename, lastModified, lastModified, function(err){
+// 					if(err) { return console.error('Error updating cache date for',url,err); }
+// 					// overwrite old cache entry with new one
+// 					// try setting the mode of the file first
+// 					fs.chmod(filename, mode, function() {
+// 						fs.unlink(filename, function(){
+// 							fs.rename(tmpfilename, filename, function(err){
+// 								if(err) { return console.error('Error renaming cache file for',url,err); }
+// 							});
+// 						});
+// 					});
+// 				});
+// 			});
+// 			stream.write(type.slice(0,1), 'ascii');
+// 			stream.end(data);
+// 			data = null;
+// 		});
+// 	});
+// };
 
 // Transport.prototype.doNTLMAuth = function(options, res, cb){
 // 	var that = this;
@@ -163,7 +163,7 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 	var code = 0;
 
 	var tidyError = function(err) {
-		if(err) {
+		if (err) {
 			err.kind = err.kind || 'upstream';
 			err.url = options.uri;
 			err.source = options.source;
@@ -173,12 +173,14 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 	};
 
 	// retry the request after a delay on faliure
-	var retry = function(){
+	var retry = function() {
 		var delay = options.retryDelay || 250;
 		delay = Math.ceil((delay * tries) + (Math.random() * delay));
 		tries++;
-		console.log('RETRY','Retrying fetch after '+delay+'ms, try '+tries);
-		setTimeout(function(){ that.oneFetch(options, cb, tries); }, delay);
+		console.log('RETRY', 'Retrying fetch after ' + delay + 'ms, try ' + tries);
+		setTimeout(function() {
+			that.oneFetch(options, cb, tries);
+		}, delay);
 	};
 
 	// function to decode the raw text to to json
@@ -274,43 +276,45 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 
 
 		// else 
-			if( options.method === 'GET' || options.method === 'POST' ) {
+		if (options.method === 'GET' || options.method === 'POST') {
 
 			// set up http request
 			var parsedUrl = url.parse(options.uri);
 			// set up options that will be passed to the request
-			var proto = parsedUrl.protocol === 'https:' ? https: http;
+			var protocol = parsedUrl.protocol === 'https:' ? https : http;
 			var parsedOptions = {
 				method: options.method,
 				hostname: parsedUrl.hostname,
 				port: parsedUrl.port || undefined,
 				path: parsedUrl.path,
 				headers: options.headers ? utils.objectCopy(options.headers) : {},
-				agent: options.agent || proto.globalAgent
+				agent: options.agent || protocol.globalAgent
 			};
-			if(parsedUrl.port) { parsedOptions.port = parsedUrl.port; }
-			if(options.auth) {
-				if(options.auth.type === 'basic') {
-					parsedOptions.auth = options.auth.user+':'+options.auth.pass;
-				}
-				if(options.auth.type === 'oauth') {
-					parsedOptions.headers['Authorization'] = 'Bearer ' + options.auth.bearer;
-				}
-				if(options.auth.type === 'ntlm') {
-					parsedOptions.headers['Authorization'] = options.auth.sendAuthHeader;
-				}
-   			}
+			if (parsedUrl.port) {
+				parsedOptions.port = parsedUrl.port;
+			}
+			// if(options.auth) {
+			// 	if(options.auth.type === 'basic') {
+			// 		parsedOptions.auth = options.auth.user+':'+options.auth.pass;
+			// 	}
+			// 	if(options.auth.type === 'oauth') {
+			// 		parsedOptions.headers['Authorization'] = 'Bearer ' + options.auth.bearer;
+			// 	}
+			// 	if(options.auth.type === 'ntlm') {
+			// 		parsedOptions.headers['Authorization'] = options.auth.sendAuthHeader;
+			// 	}
+   // 			}
 
-   			if(this.config.proxy && parsedUrl.protocol !== 'https:') {
-   				parsedOptions.headers.Hostname = parsedOptions.hostname + (parsedOptions.port ? ':' + parsedOptions.port : '');
-   				parsedOptions.hostname = this.config.proxy.host;
-   				parsedOptions.port = this.config.proxy.port;
-   				parsedOptions.path = options.uri;
-   			}
+			if (this.config.proxy && parsedUrl.protocol !== 'https:') {
+				parsedOptions.headers.Hostname = parsedOptions.hostname + (parsedOptions.port ? ':' + parsedOptions.port : '');
+				parsedOptions.hostname = this.config.proxy.host;
+				parsedOptions.port = this.config.proxy.port;
+				parsedOptions.path = options.uri;
+			}
 
 			// check cache to see if we have cached data for this request
-			that.checkCache(options.uri, function(err, ifModifiedSince) {
-				lastModifiedRequest = ifModifiedSince || 0;
+			// that.checkCache(options.uri, function(err, ifModifiedSince) {
+			// 	lastModifiedRequest = ifModifiedSince || 0;
 
 				// var getFromCache;
 
@@ -340,7 +344,7 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 				// 	};
 				// }
 				// get the remote file
-				var r = proto.request(parsedOptions, function(res) {
+				var r = protocol.request(parsedOptions, function(res) {
 					responseTime = Date.now();
 
 					// on http error try again
@@ -374,7 +378,7 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 						}
 
 						// save this response to cache
-						that.setCache(options.uri, lastModified, type, raw);
+						// that.setCache(options.uri, lastModified, type, raw);
 
 						// add to fetch stats
 						// report(404);
@@ -383,25 +387,25 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 					}
 
 					// not modified response received or too many errors and we have a cached version
-					if(res.statusCode === 304 && getFromCache) {
-						res.socket.end();
-						return getFromCache(res.statusCode);
-					}
+					// if(res.statusCode === 304 && getFromCache) {
+					// 	res.socket.end();
+					// 	return getFromCache(res.statusCode);
+					// }
 
 					// on other errors or too many 500 errors
-					if(res.statusCode !== 200) {
-						res.socket.end();
+					// if(res.statusCode !== 200) {
+					// 	res.socket.end();
 
-						if(getFromCache) {
-							console.warn('Fetch', res.statusCode, 'error on try', tries, 'for', options.uri, 'Using cached version.');
-							return getFromCache(res.statusCode);
-						}
+					// 	if(getFromCache) {
+					// 		console.warn('Fetch', res.statusCode, 'error on try', tries, 'for', options.uri, 'Using cached version.');
+					// 		return getFromCache(res.statusCode);
+					// 	}
 
-						// report(res.statusCode);
+					// 	// report(res.statusCode);
 
-						var err = new Error('HTTP Error '+res.statusCode);
-						return cb(tidyError(err));
-					}
+					// 	var err = new Error('HTTP Error '+res.statusCode);
+					// 	return cb(tidyError(err));
+					// }
 
 
 					if(res.statusCode === 200) {
@@ -456,7 +460,7 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 							}
 
 							// save this response to cache
-							that.setCache(options.uri, lastModified, type, raw);
+							// that.setCache(options.uri, lastModified, type, raw);
 
 							// add to fetch stats
 							// report(200);
@@ -488,10 +492,10 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 						return retry();
 					}
 
-					if(getFromCache) {
-						console.warn('Fetch socket error on try', tries, 'for', options.uri,':',err,'Using cached version.');
-						return getFromCache();
-					}
+					// if(getFromCache) {
+					// 	console.warn('Fetch socket error on try', tries, 'for', options.uri,':',err,'Using cached version.');
+					// 	return getFromCache();
+					// }
 
 					// report();
 
@@ -508,7 +512,7 @@ Transport.prototype.oneFetch = function(options, cb, tries) {
 
 				r.end();
 
-			});
+			// }); // end checkCache
 		}
 
 
