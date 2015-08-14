@@ -14,13 +14,14 @@ function SourceManager() {
 
 // configure source manager
 SourceManager.prototype.init = function(config, definitions){
-	this.config = config;
+	console.log(JSON.stringify(definitions).blue);
+  this.config = config;
 	this.configured = true;
         // pre-build the regexp for each pattern
 	for(var i = 0; i < definitions.length; i++) {
 		for(var j=0; j < definitions[i].length; j++){
 			var definition = definitions[i][j];
-                        
+
 			if(reIsRegExpString.exec(definition.pattern)) {
 				definition.regexp = new RegExp('^'+definition.pattern+'$');
 
@@ -35,7 +36,9 @@ SourceManager.prototype.init = function(config, definitions){
 
 		}
 	}
-
+  console.log(JSON.stringify(definitions).green);
+  console.log(JSON.stringify(this.patternByRegexp).blue);
+  console.log(JSON.stringify(this.patternByName).green);
 	// configure any existing sources
 	for(var name in this.sources) {
 		this.sources[name].init(config);
